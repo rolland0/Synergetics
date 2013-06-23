@@ -1,0 +1,21 @@
+{
+  "modinfoversion": 2,
+  "modlist": [{
+    "modid": "Synergetics",
+    "name": "Synergetics",
+    "description": "Synergetics. Melding mods together",
+    "version": "0.0.1",
+    "mcversion": "1.5.2",
+    "url": "",
+    "updateUrl": "",
+    "authors": [ "rolland0"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "parent": "",
+    "requiredMods": [ "Forge"],
+    "dependencies": [],
+    "dependants": [],
+    "useDependencyInformation": "false"
+  }]
+}
