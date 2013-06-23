@@ -4,39 +4,61 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import rolland0.mods.synergetics.lib.SynReference;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
+import rolland0.mods.synergetics.lib.SynRef;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
-public class SynOreBlock extends Block {
-	private int blockId;
-	private byte metaValue;
+public class SynOreBlock extends Block { 
+	private int maxHits;
 	private String displayName;
 	private int harvestLevel;
 	private String uniqueName;
 	
-	public SynOreBlock(int id, byte maxHits, String displayName, int harvestLevel, String uniqueName) {
+	public SynOreBlock(int id, int maxHits, String displayName, int harvestLevel, String uniqueName) {
 		super(id, Material.rock);
-		this.setHardness(SynReference.OreHardness);
+		this.setHardness(SynRef.ORE_HARDNESS);
 		this.setUnlocalizedName(uniqueName);
 		this.setCreativeTab(CreativeTabs.tabBlock);
 		this.setStepSound(soundStoneFootstep);
-		blockId = id;
-		metaValue = maxHits;
+		this.maxHits = maxHits;
 		this.displayName = displayName;
 		this.harvestLevel = harvestLevel;
 		this.uniqueName = uniqueName;
 	}
 	
+	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerIcons(IconRegister iconRegister) {
-		this.blockIcon = iconRegister.registerIcon(SynReference.MOD_ID + ":" + uniqueName);
+		this.blockIcon = iconRegister.registerIcon(SynRef.MOD_ID + ":" + uniqueName);
+	}
+	
+	@Override
+	public void harvestBlock(World world, EntityPlayer player, int x, int y, int z, int meta) {
+		player.addExhaustion(0.025F);
+		System.out.println(uniqueName + " harvested from {" + x + "," + y + "," + z + "} with meta: " + meta);
+		if(meta > 1) {
+			world.setBlock(x, y, z, this.blockID, meta-1, 2);
+		}
+	}
+	
+	@Override
+	public void onBlockAdded(World world, int x, int y, int z) {
+		if(world.getBlockMetadata(x, y, z) == 0) {
+			int hits = SynRef.rand.nextInt(this.maxHits)+1;
+			world.setBlock(x, y, z, this.blockID, hits, 2);
+			System.out.println("Block added: " + this.uniqueName + " with meta: " + hits);
+		}
+		
 	}
 
 	public int getId() {
-		return blockId;
+		return this.blockID;
 	}
 	
-	public short getMeta() {
-		return metaValue;
+	public int getMaxHits() {
+		return maxHits;
 	}
 
 	public String getDisplayName() {
