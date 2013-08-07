@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import rolland0.mods.synergetics.lib.SynRef;
@@ -38,6 +39,7 @@ public class SynOreBlock extends Block {
 	public void harvestBlock(World world, EntityPlayer player, int x, int y, int z, int meta) {
 		player.addExhaustion(0.025F);
 		System.out.println(uniqueName + " harvested from {" + x + "," + y + "," + z + "} with meta: " + meta);
+		int fortuneModifier = EnchantmentHelper.getFortuneModifier(player);
 		if(meta > 1) {
 			world.setBlock(x, y, z, this.blockID, meta-1, 2);
 		}
