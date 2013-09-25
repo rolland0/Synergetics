@@ -9,5 +9,9 @@ public class CommonProxy {
 	public void registerCraftingHandlers() {
 		
 	}
+	
+	public void registerSounds() {
+		
+	}
 
 }
