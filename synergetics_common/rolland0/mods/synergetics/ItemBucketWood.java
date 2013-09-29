@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.Event;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
-import rolland0.mods.synergetics.lib.SynRef;
+import rolland0.mods.synergetics.lib.Reference;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -24,7 +24,7 @@ public class ItemBucketWood extends Item {
     public ItemBucketWood(int id, int containedBlockId, String name)
     {
         super(id);
-        if(id == SynRef.ItemID_BucketWoodEmpty)
+        if(id == Reference.ItemID_BucketWoodEmpty)
         	this.maxStackSize = 16;
         else
         	this.maxStackSize = 1;
@@ -37,7 +37,7 @@ public class ItemBucketWood extends Item {
 	@Override
 	public void registerIcons(IconRegister iconRegister) {
 		String iconLocation = (containedBlockId == Block.waterMoving.blockID)
-				 ? SynRef.TextureLocation_BucketWoodWater : SynRef.TextureLocation_BucketWoodEmpty;
+				 ? Reference.TextureLocation_BucketWoodWater : Reference.TextureLocation_BucketWoodEmpty;
 		this.itemIcon = iconRegister.registerIcon(iconLocation);
 	}
 	

@@ -1,4 +1,4 @@
-package rolland0.mods.synergetics.lib;
+package rolland0.mods.scraps;
 
 public class SynIdManager {
 	private static int lastItemId = 5000;

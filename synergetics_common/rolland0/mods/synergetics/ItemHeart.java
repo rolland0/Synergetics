@@ -7,19 +7,19 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import rolland0.mods.synergetics.lib.SynRef;
+import rolland0.mods.synergetics.lib.Reference;
 
 public class ItemHeart extends Item {
 
 	public ItemHeart() {
-		super(SynRef.ItemID_Heart);
-		setUnlocalizedName(SynRef.ItemName_Heart);
+		super(Reference.ItemID_Heart);
+		setUnlocalizedName(Reference.ItemName_Heart);
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerIcons(IconRegister iconRegister) {
-		this.itemIcon = iconRegister.registerIcon(SynRef.TextureLocation_Heart);
+		this.itemIcon = iconRegister.registerIcon(Reference.TextureLocation_Heart);
 	}
 	
 	@Override

@@ -6,22 +6,22 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import rolland0.mods.synergetics.lib.SynRef;
+import rolland0.mods.synergetics.lib.Reference;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class SynMortor extends Item {
 
 	public SynMortor() {
-		super(SynRef.ItemID_Mortor);
-		this.setUnlocalizedName(SynRef.ItemName_Mortor);
+		super(Reference.ItemID_Mortor);
+		this.setUnlocalizedName(Reference.ItemName_Mortor);
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerIcons(IconRegister iconRegister) {
 		this.itemIcon = iconRegister
-				.registerIcon(SynRef.TextureLocation_Mortor);
+				.registerIcon(Reference.TextureLocation_Mortor);
 	}
 
 	@Override

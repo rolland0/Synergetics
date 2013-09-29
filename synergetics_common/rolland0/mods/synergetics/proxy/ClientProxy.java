@@ -1,5 +1,6 @@
-package rolland0.mods.synergetics;
+package rolland0.mods.synergetics.proxy;
 
+import rolland0.mods.synergetics.SynSounds;
 import net.minecraftforge.common.MinecraftForge;
 
 public class ClientProxy extends CommonProxy {

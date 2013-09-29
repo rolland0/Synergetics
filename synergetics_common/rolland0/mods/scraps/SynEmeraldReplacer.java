@@ -1,3 +1,4 @@
+package rolland0.mods.scraps;
 //package rolland0.mods.synergetics;
 //
 //import net.minecraft.block.BlockOre;

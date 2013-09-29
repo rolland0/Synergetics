@@ -1,6 +1,6 @@
 package rolland0.mods.synergetics;
 
-import rolland0.mods.synergetics.lib.SynRef;
+import rolland0.mods.synergetics.lib.Reference;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,7 +19,7 @@ public class EntityHeart extends EntityItem {
 	public void onCollideWithPlayer(EntityPlayer player){
 		if(!worldObj.isRemote) {
 			if(player.shouldHeal())
-				this.playSound(SynRef.SoundHeal, 0.6f, 1.0f);
+				this.playSound(Reference.SoundHeal, 0.6f, 1.0f);
 			else
 				this.playSound("random.pop",  1.0f,  0.7f);
 		}

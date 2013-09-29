@@ -1,4 +1,4 @@
-package rolland0.mods.synergetics;
+package rolland0.mods.scraps;
 
 import net.minecraftforge.event.Event;
 import net.minecraftforge.event.Event.Result;

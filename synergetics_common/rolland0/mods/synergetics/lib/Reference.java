@@ -2,7 +2,7 @@ package rolland0.mods.synergetics.lib;
 
 import java.util.Random;
 
-public class SynRef {
+public class Reference {
 	
 	public static Random rand = new Random(System.currentTimeMillis());
 	
@@ -70,6 +70,10 @@ public class SynRef {
 
 	public static final String SoundHeal = Mod_Path + "heal";
 	public static final String SoundHealFile = SoundHeal + ".ogg";
+
+	public static final String CLIENT_PROXY_CLASS = "rolland0.mods.synergetics.proxy.ClientProxy";
+
+	public static final String SERVER_PROXY_CLASS = "rolland0.mods.synergetics.proxy.CommonProxy";
 	
 
 	
