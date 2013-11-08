@@ -1,27 +1,32 @@
-package mod.rolland0.synergetics;
+package mod.rolland0.synergetics.items;
 
-import mod.rolland0.synergetics.lib.Reference;
+import mod.rolland0.synergetics.lib.ItemRefInfo;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class SynMortor extends Item {
+public class ItemMortor extends Item {
+	private ItemRefInfo info;
 
-	public SynMortor() {
-		super(Reference.ItemID_Mortor);
-		this.setUnlocalizedName(Reference.ItemName_Mortor);
+	public ItemMortor(ItemRefInfo info) {
+		super(info.getItemID());
+		this.info = info;
+		this.setUnlocalizedName(info.getInternalName());
+		GameRegistry.registerItem(this, info.getInternalName());
+		LanguageRegistry.addName(this, info.getDisplayName());
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerIcons(IconRegister iconRegister) {
-		this.itemIcon = iconRegister
-				.registerIcon(Reference.TextureLocation_Mortor);
+		this.itemIcon = iconRegister.registerIcon(info.getInternalName());
 	}
 
 	@Override

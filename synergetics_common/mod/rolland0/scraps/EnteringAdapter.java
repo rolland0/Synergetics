@@ -1,24 +1,14 @@
 package mod.rolland0.scraps;
 
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
-
-import static org.objectweb.asm.Opcodes.*;
 
 
 public class EnteringAdapter extends AdviceAdapter {
-	private String name;
-	/*private int timeVar;
-	private Label timeVarStart = new Label();
-	private Label timeVarEnd = new Label();*/
-
 	protected EnteringAdapter(MethodVisitor mv, int acc,
 			String name, String desc) {
 		super(ASM4, mv, acc, name, desc);
-		this.name = name;
 	}
 	
 	@Override

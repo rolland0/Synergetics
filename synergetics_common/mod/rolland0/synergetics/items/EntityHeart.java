@@ -1,5 +1,6 @@
-package mod.rolland0.synergetics;
+package mod.rolland0.synergetics.items;
 
+import mod.rolland0.synergetics.Synergetics;
 import mod.rolland0.synergetics.lib.Reference;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;

@@ -2,210 +2,242 @@ package mod.rolland0.synergetics;
 
 import java.util.ArrayList;
 
-import cpw.mods.fml.common.registry.GameRegistry;
+import mod.rolland0.synergetics.items.EntityHeart;
 import mod.rolland0.synergetics.lib.Reference;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumArmorMaterial;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-import net.minecraft.item.crafting.CraftingManager;
+import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.Event.Result;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent.CheckSpawn;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class SynergeticsEventHandler {
+	public static EntityPlayer player = null;
+	public static final int MOUSE_LEFT_CLICK = 0;
+	public static final int MOUSE_RIGHT_CLICK = 1;
+	public static final int MOUSE_MIDDLE_CLICK = 2;
 
-	// @ForgeSubscribe
-	// public void onWorldSave(Save event) {
-	// if(event.world.isRemote) {
-	// String[] usernames = MinecraftServer.getServer().getAllUsernames();
-	// for (String username : usernames) {
-	// EntityPlayer player = event.world.getPlayerEntityByName(username);
-	// SynergeticsExtendedProperties.saveProxyData(player);
-	// }
-	// }
-	// }
+//	@ForgeSubscribe
+//	public void onPlayerInteractEvent(PlayerInteractEvent event) {
+//		if (!event.entityPlayer.worldObj.isRemote) {
+//			if (event.action == Action.LEFT_CLICK_BLOCK
+//					&& event.entityPlayer.swingProgressInt == -1) {
+//				System.out.println("Click");
+//			} else {
+//				System.out.println("Bad swing");
+//				event.entityPlayer.isSwingInProgress = false;
+//			}
+//
+//		}
+//	}
+//	
+//	@ForgeSubscribe
+//	public void onEntitySpawn(EntityConstructing event) {
+//		if(event.entity instanceof EntityMob) {
+//			EntityMob mob = (EntityMob)event.entity;
+//		}
+//	}
+//	
+	
+	@ForgeSubscribe
+	public void onUpdate(LivingUpdateEvent event) {
+		if(event.entity instanceof EntityMob
+				&& event.entity.ticksExisted > Reference.MAX_MOB_LIFE) {
+			//System.out.println(event.entity.ticksExisted);
+			event.entity.setDead();
+			//System.out.println("Dead");
+		}
+	}
+	
+	@ForgeSubscribe
+	public void onSpawnCheck(CheckSpawn event) {
+		if (event.entity instanceof EntityMob) {
+			EntityMob mob = (EntityMob) event.entity;
+			if (mob.worldObj.getClosestPlayerToEntity(mob, Reference.MOB_SPAWN_DISTANCE) == null) {
+				event.setResult(Result.DENY);
+			} else if (!mob.worldObj.canBlockSeeTheSky((int) event.x, (int) event.y, (int) event.z)) {
+				event.setResult(Result.ALLOW);
+			}
+		}
+		// System.out.println(event.entity.worldObj.getBlockId((int)event.x,
+		// (int)event.y, (int)event.z));
+		// System.out.println(event.entity.getEntityName() + ": " + event.x +
+		// "," + event.y + "," + event.z);
+	}
 
-	// @ForgeSubscribe
-	// public void onPlayerJoin(EntityJoinWorldEvent event) {
-	// if(event.entity instanceof EntityPlayerMP) {
-	// EntityPlayer player = (EntityPlayer) event.entity;
-	// SynergeticsExtendedProperties.loadProxyData(player);
-	// SynergeticsExtendedProperties props =
-	// SynergeticsExtendedProperties.get(player);
-	// if(props != null) {
-	// props.persistExp();
-	// }
-	// else
-	// System.out.println("No props");
-	//
-	// }
-	// else if(event.entity instanceof EntityPlayer) {
-	//
-	// //player.addExperience(CommonProxy.getEntityData(CommonProxy.getSaveKey(player)));
-	// }
-	//
-	// }
+	@ForgeSubscribe
+	public void onMouseClick(MouseEvent event) {
+//		logMousePress(event);
+		if(player == null) {
+			player = Minecraft.getMinecraft().thePlayer;
+		}
+		if(event.button == MOUSE_LEFT_CLICK && event.buttonstate) {
+			if(player.swingProgressInt != 0) {
+				event.setCanceled(true);
+			}
+		}
+	}
 
-	// @ForgeSubscribe
-	// public void onEntityConstructing(EntityConstructing event) {
-	// if (event.entity instanceof EntityPlayer &&
-	// SynergeticsExtendedProperties.get((EntityPlayer)event.entity) == null) {
-	// System.out.println("Registering props");
-	// SynergeticsExtendedProperties.register((EntityPlayer)event.entity);
-	// }
-	// }
+private void logMousePress(MouseEvent event) {
+	if(event.button != -1) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Button: ");
+		builder.append(event.button);
+		builder.append(" ButtonState: ");
+		builder.append(event.buttonstate);
+		builder.append(" Nanoseconds: ");
+		builder.append(event.nanoseconds);
+	    builder.append(" X: ");
+	    builder.append(event.x);
+	    builder.append(" Y: ");
+	    builder.append(event.y);
+	    builder.append(" Dx: ");
+	    builder.append(event.dx);
+	    builder.append(" Dy: ");
+	    builder.append(event.dy);
+	    builder.append(" Dwheel: ");
+	    builder.append(event.dwheel);
+
+		System.out.println(builder);
+	}
+}
 
 	@ForgeSubscribe
 	public void onEntityAttack(LivingAttackEvent event) {
-		// player is attacked
-		if (event.entity instanceof EntityPlayer
-				&& event.source.getEntity() instanceof EntityMob) {
-			EntityMob mob = (EntityMob) event.source.getEntity();
-			mob.attackTime = Reference.ZombieAttackDelay;
-		}
+		if (event.entityLiving.getEntityName().equals("Zombie")
+				|| event.entityLiving.getEntityName().equals("rolland0")) {
+			if (event.source != null && event.source.getEntity() instanceof EntityLiving) {
+//				((EntityLiving) event.source.getEntity()).addPotionEffect(new PotionEffect(
+//						Potion.digSlowdown.id, 20, 0, false));
+				if (event.source.getEntity() instanceof EntityMob) {
+					EntityMob mob = (EntityMob) event.source.getEntity();
+					mob.attackTime = 100;
+				}
+			}
+			// // player is attacked
+			// if (event.entity instanceof EntityPlayer
+			// && event.source.getEntity() instanceof EntityMob) {
+			// EntityMob mob = (EntityMob) event.source.getEntity();
+			// mob.attackTime = Reference.ZombieAttackDelay;
+			// }
 
-		// player attacks something
-		else if (event.source.getEntity() instanceof EntityPlayer) {
-			// System.out.println("Entity: " + event.entity.getEntityName() +
-			// " Source: " + event.source.getDamageType() + " Ammount: " +
-			// event.ammount);
+			// player attacks something
+			else if (event.source.getEntity() instanceof EntityPlayer
+					&& !event.source.getEntity().worldObj.isRemote) {
+				EntityPlayer player = (EntityPlayer) event.source.getEntity();
+				if (player.swingProgressInt != -1) {
+					event.setCanceled(true);
+					player.isSwingInProgress = false;
+					return;
+				}
+			}
 		}
-		// if(event.entity instanceof EntityMob) {
-		// System.out.println(event.entity.);
-		// EntityMob mob = (EntityMob)event.entity;
-		// mob.
-		// }
 	}
-
-	//
-	// @ForgeSubscribe
-	// public void onEntitySpawn(EntityJoinWorldEvent event) {
-	// if(event.entity instanceof EntityLivingBase) {
-	// EntityLivingBase entity = (EntityLivingBase)event.entity;
-	// entity.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).setAttribute(SharedMonsterAttributes.knockbackResistance.getDefaultValue());
-	// }
-	// // if(event.entity instanceof EntityArrow) {
-	// // EntityArrow arrow = (EntityArrow)event.entity;
-	// // arrow.knockbackStrength = 0;
-	// // }
-	// }
 
 	@ForgeSubscribe
 	public void onBlockHarvest(HarvestDropsEvent event) {
-		boolean isWood = false;
-		ArrayList<ItemStack> logs = OreDictionary.getOres("logWood");
-		for (ItemStack itemStack : logs) {
-			if (event.block.blockID == itemStack.getItem().itemID
-					&& event.blockMetadata == itemStack.getItem().getMetadata(
-							event.blockMetadata)) {
-				isWood = true;
-			}
+		// general calls
+		if (event.block.blockID == Block.gravel.blockID && !event.isSilkTouching) {
+			dropFlint(event);
+		}
+		
+		persistWood(event);
+
+		// requires player
+		if (event.harvester instanceof EntityPlayer) {
+			
+			dropSticks(event);
 		}
 
-		if (event.harvester instanceof EntityPlayer) {
-			ItemStack item = event.harvester.getCurrentEquippedItem();
-			{
-				if(item != null && item.itemID == Item.pickaxeGold.itemID)
-					System.out.println(item.getItemDamage());
-				if (isWood) {
-					boolean shouldDrop = false;
+		String eventLog = "Block: "+ event.block.blockID + " " + event.block.getLocalizedName() + " Drops: ";
+		for (ItemStack stack : event.drops) {
+			eventLog += "(" + stack.getDisplayName() + "x" + stack.stackSize + ") ";
+		}
+		if(event.harvester instanceof EntityPlayer)
+			System.out.println(eventLog);
 
-					if (item != null
-							&& ForgeHooks.isToolEffective(item, event.block,
-									event.blockMetadata))
-						shouldDrop = true;
+	}
+	
+	private void dropSticks(HarvestDropsEvent event) {
+		if (event.world.isRemote) 
+			return;
+		for (int i = 0; i < Reference.StickDropBlocks.length; i++) {
+			if (event.block.blockID == Reference.StickDropBlocks[i]
+					&& Reference.rollDie(Reference.StickDropChance)) {
+				event.drops.add(new ItemStack(Item.stick));
+				break;
+			}
+		}
+	}
 
-					if (!shouldDrop) {
-						event.drops.clear();
-						event.world.setBlock(event.x, event.y, event.z,
-								event.block.blockID, event.blockMetadata, 2);
-					}
+	private void dropFlint(HarvestDropsEvent event) {
+		if (event.world.isRemote)
+			return;
+		event.drops.clear();
+		event.drops.add(new ItemStack(Item.flint));
+		if (Reference.rollDie(Reference.FlintDropChance))
+			event.drops.add(new ItemStack(Item.flint));
+	}
+	
+	private boolean isWood(Block block, int blockMetadata) {
+		ArrayList<ItemStack> logs = OreDictionary.getOres("logWood");
+		for (ItemStack itemStack : logs) {
+			if (block.blockID == itemStack.getItem().itemID
+					&& blockMetadata == itemStack.getItem().getMetadata(blockMetadata)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void persistWood(HarvestDropsEvent event) {
+		if (isWood(event.block, event.blockMetadata)) {
+			event.drops.clear();
+			if (event.harvester != null) {
+				ItemStack item = event.harvester.getCurrentEquippedItem();
+				if (item != null
+						&& ForgeHooks.isToolEffective(item, event.block, event.blockMetadata)) {
+					event.drops.add(new ItemStack(Synergetics.itemPlank));
+					event.drops.add(new ItemStack(Synergetics.itemPlank));
+					// event.world.setBlock(event.x, event.y, event.z,
+					// event.block.blockID,
+					// event.blockMetadata, 2);
 				}
 			}
 
+				
 		}
-
-		String eventLog = "Block: " + event.block.getLocalizedName()
-				+ " Drops: ";
-		for (ItemStack stack : event.drops) {
-			eventLog += "(" + stack.getDisplayName() + "x" + stack.stackSize
-					+ ") ";
-		}
-		System.out.println(eventLog);
-
 	}
-
-	// @ForgeSubscribe
-	// public void onEntityHurt(LivingHurtEvent event) {
-	// double multiplier = 0.5;
-	// if((event.source.getSourceOfDamage() instanceof EntityArrow)) {
-	// multiplier = 0.2;
-	// }
-	// event.entity.motionX *= multiplier;
-	// event.entity.motionY *= multiplier;
-	// event.entity.motionZ *= multiplier;
-	// //event.entity.addVelocity(0, 0, 0);
-	//
-	// // System.out.println(event.entity.getEntityName());
-	// // System.out.println("        entity:       " +
-	// event.source.getEntity());
-	// // System.out.println("        damage type:  " +
-	// event.source.getDamageType());
-	// // System.out.println("        damage source: " +
-	// event.source.getSourceOfDamage());
-	// //
-	// }
 
 	@ForgeSubscribe
 	public void onLivingDeath(LivingDeathEvent event) {
 		// if player killed entity, spawn a heart
 		if (event.source.getEntity() instanceof EntityPlayer
 				&& shouldSpawnHeart((EntityPlayer) event.source.getEntity())) {
-			event.entity.worldObj.spawnEntityInWorld(new EntityHeart(
-					event.entity.worldObj, event.entity));
+			event.entity.worldObj.spawnEntityInWorld(new EntityHeart(event.entity.worldObj,
+					event.entity));
 		}
-
-		// //if the dead entity is a player, persist its extended properties
-		// if(event.entity instanceof EntityPlayer) {
-		// EntityPlayer player = (EntityPlayer) event.entity;
-		//
-		// // NBTTagCompound playerData = new NBTTagCompound();
-		// // ((SynergeticsExtendedProperties)
-		// (event.entity.getExtendedProperties(SynergeticsExtendedProperties.identifier))).saveNBTData(playerData);
-		// // CommonProxy.storeEntityData(player.username, playerData);
-		// // SynergeticsExtendedProperties.saveProxyData(player);
-		// // Synergetics.proxy.putExp(player.username, player.experienceTotal);
-		// SynergeticsExtendedProperties props =
-		// SynergeticsExtendedProperties.get(player);
-		// if(props != null) {
-		// System.out.println("Death - updating exp");
-		// props.updateExp();
-		// }
-		// else
-		// System.out.println("Death - No props found");
-		// SynergeticsExtendedProperties.saveProxyData(player);
-		// player.experience = 0;
-		// player.experienceLevel = 0;
-		// player.experienceTotal = 0;
-		// }
 	}
 
 	private boolean shouldSpawnHeart(EntityPlayer player) {
 		return player.getHealth() < player.getMaxHealth()
-				&& Reference.rand.nextInt(100) < Reference.HeartDropChance;
+				&& Reference.rollDie(Reference.HeartDropChance);
 	}
 
 	@ForgeSubscribe
 	public void onWorldLoad(WorldEvent.Load event) {
 		event.world.getGameRules().setOrCreateGameRule("keepInventory", "true");
 	}
-
 }

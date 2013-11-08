@@ -8,8 +8,12 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 public class ClassPatcher implements IClassTransformer {
@@ -74,31 +78,61 @@ public class ClassPatcher implements IClassTransformer {
 			for(int i = 0; i < classNode.methods.size() && targetIndex == -1; i++) {
 				MethodNode mn = classNode.methods.get(i);
 				for(int j = 0; j < mn.instructions.size() && targetIndex == -1; j++) {
-					if(mn.instructions.get(j).getOpcode() == Opcodes.BIPUSH) {
-						IntInsnNode intNode = (IntInsnNode)mn.instructions.get(j);
-						if(intNode.operand == 32)
+					if(mn.instructions.get(j).getOpcode() == Opcodes.LDC) {
+						LdcInsnNode targetNode = (LdcInsnNode)mn.instructions.get(j);
+						if(targetNode.cst.equals("GOLD"))
 							targetIndex = j;
 					}
 				}
 				if(targetIndex != -1) {
-					mn.instructions.insertBefore(mn.instructions.get(targetIndex), new IntInsnNode(Opcodes.SIPUSH, 750));
-					mn.instructions.remove(mn.instructions.get(targetIndex+1));	
+					targetIndex += 2; //ICONST_0  --> miningLevel
+					replaceInstruction(mn.instructions, mn.instructions.get(targetIndex), new InsnNode(Opcodes.ICONST_2));
+					targetIndex += 1; //BIPUSH 32 --> durability
+					replaceInstruction(mn.instructions, mn.instructions.get(targetIndex), new IntInsnNode(Opcodes.SIPUSH, 750));
+					targetIndex += 1; //LDC 12.0  --> efficiencyOnProperMaterial
+					replaceInstruction(mn.instructions, mn.instructions.get(targetIndex), new LdcInsnNode(7.0f));
+					targetIndex += 1; //FCONST_0  --> damageVsEntity
+					replaceInstruction(mn.instructions, mn.instructions.get(targetIndex), new LdcInsnNode(2.5f));
+					targetIndex += 1; //BIPUSH 22 --> enchantability
+					replaceInstruction(mn.instructions, mn.instructions.get(targetIndex), new IntInsnNode(Opcodes.BIPUSH, 18));
 				}
 			}
+			
+			ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+			classNode.accept(writer);
+			return writer.toByteArray();
+		}
+		
+		else if(transformedName.equals("net.minecraft.item.EnumArmorMaterial")) {
+			ClassNode classNode = new ClassNode();
+			ClassReader classReader = new ClassReader(bytes);
+			classReader.accept(classNode, 0);
+			int targetIndex = -1;
+			for(int i = 0; i < classNode.methods.size() && targetIndex == -1; i++) {
+				MethodNode mn = classNode.methods.get(i);
+				for(int j = 0; j < mn.instructions.size() && targetIndex == -1; j++) {
+					if(mn.instructions.get(j).getOpcode() == Opcodes.LDC) {
+						LdcInsnNode targetNode = (LdcInsnNode)mn.instructions.get(j);
+						if(targetNode.cst.equals("GOLD"))
+							targetIndex = j;
+					}
+				}
+				if(targetIndex != -1) {
+					targetIndex += 2; //BIPUSH 7
+					replaceInstruction(mn.instructions, mn.instructions.get(targetIndex), new IntInsnNode(Opcodes.BIPUSH, 22));
+					targetIndex += 5; //ICONST_2
+					replaceInstruction(mn.instructions, mn.instructions.get(targetIndex), new IntInsnNode(Opcodes.BIPUSH, 3));
+					targetIndex += 4; //ICONST_5
+					replaceInstruction(mn.instructions, mn.instructions.get(targetIndex), new IntInsnNode(Opcodes.BIPUSH, 7));
+					targetIndex += 4; //ICONST_3
+					replaceInstruction(mn.instructions, mn.instructions.get(targetIndex), new IntInsnNode(Opcodes.BIPUSH, 5));
+					targetIndex += 4; //ICONST_1
+					replaceInstruction(mn.instructions, mn.instructions.get(targetIndex), new IntInsnNode(Opcodes.BIPUSH, 2));
+					targetIndex += 2; //BIPUSH 25
+					replaceInstruction(mn.instructions, mn.instructions.get(targetIndex), new IntInsnNode(Opcodes.BIPUSH, 15));
+				}
 				
-//				AbstractInsnNode node = mn.instructions.getFirst();
-//				while(node.getNext() != null) {
-//					if(node.getOpcode() == Opcodes.BIPUSH) {
-//						IntInsnNode newNode = (IntInsnNode)node;
-//						if(newNode.operand == 32) {
-//							newNode.operand = 750;
-//							System.out.println("************************************ VALUE CHANGED");
-//							break;
-//						}
-//					}
-//					node = node.getNext();
-//				}
-//			}
+			}
 			
 			ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 			classNode.accept(writer);
@@ -106,6 +140,11 @@ public class ClassPatcher implements IClassTransformer {
 		}
 		
 		return bytes;
+	}
+	
+	private void replaceInstruction(InsnList instructions, AbstractInsnNode loc, AbstractInsnNode insn) {
+		instructions.insertBefore(loc, insn);
+		instructions.remove(loc);
 	}
 
 	public String toString(ClassNode node) {
@@ -128,10 +167,10 @@ public class ClassPatcher implements IClassTransformer {
 		ClassNode classNode = new ClassNode();
 		ClassReader classReader = new ClassReader(bytes);
 		classReader.accept(classNode, 0);
-		
-		
-		
+
 		return bytes;
 	}
+	
+	
 
 }

@@ -1,4 +1,4 @@
-package mod.rolland0.synergetics;
+package mod.rolland0.synergetics.items;
 
 import mod.rolland0.synergetics.lib.Reference;
 import net.minecraftforge.client.event.sound.SoundLoadEvent;
